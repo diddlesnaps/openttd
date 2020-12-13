@@ -19,7 +19,6 @@ compression: lzo
 apps:
   openttd:
     command: usr/games/openttd/openttd
-    command-chain: ["snap/command-chain/alsa-launch"]
     desktop: usr/share/applications/openttd.desktop
     extensions: [gnome-3-28]
     plugs:
@@ -42,19 +41,7 @@ layout:
     bind: $SNAP/usr/share/sounds
 
 parts:
-  alsa-mixin:
-    plugin: dump
-    source: https://github.com/diddlesnaps/snapcraft-alsa.git
-    source-subdir: snapcraft-assets
-    build-packages:
-      - libasound2-dev
-    stage-packages:
-      - libasound2
-      - libasound2-plugins
-      - yad
-
   openttd:
-    after: [alsa-mixin]
     plugin: autotools
     source: https://github.com/OpenTTD/OpenTTD.git
     override-pull: |
