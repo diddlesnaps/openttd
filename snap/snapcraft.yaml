@@ -14,10 +14,12 @@ description: >
 grade: stable
 confinement: strict
 base: core18
+compression: lzo
 
 apps:
   openttd:
     command: usr/games/openttd/openttd
+    command-chain: ["snap/command-chain/alsa-launch"]
     desktop: usr/share/applications/openttd.desktop
     extensions: [gnome-3-28]
     plugs:
@@ -27,8 +29,32 @@ apps:
       - opengl
       - x11
 
+layout:
+  /etc/default:
+    bind: $SNAP/etc/default
+  /etc/timidity:
+    bind: $SNAP/etc/timidity
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/alsa-lib:
+    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/alsa-lib
+  /usr/share/alsa:
+    bind: $SNAP/usr/share/alsa
+  /usr/share/sounds:
+    bind: $SNAP/usr/share/sounds
+
 parts:
+  alsa-mixin:
+    plugin: dump
+    source: https://github.com/diddlesnaps/snapcraft-alsa.git
+    source-subdir: snapcraft-assets
+    build-packages:
+      - libasound2-dev
+    stage-packages:
+      - libasound2
+      - libasound2-plugins
+      - yad
+
   openttd:
+    after: [alsa-mixin]
     plugin: autotools
     source: https://github.com/OpenTTD/OpenTTD.git
     override-pull: |
@@ -67,6 +93,8 @@ parts:
       - libsdl2-dev
       - zlib1g-dev
     stage-packages:
+      - fluid-soundfont-gm
+      - fluidsynth
       - fontconfig
       - freepats
       - libfluidsynth1
