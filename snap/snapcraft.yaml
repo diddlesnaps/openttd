@@ -42,32 +42,19 @@ layout:
 
 parts:
   openttd:
-    plugin: autotools
+    plugin: cmake
     source: https://github.com/OpenTTD/OpenTTD.git
     override-pull: |
       snapcraftctl pull
       VERSION="$(git tag --list --sort=version:refname | grep -v -E '(-RC|beta)' | tail -n1)"
       git checkout "$VERSION"
       snapcraftctl set-version "$VERSION"
-      sed -E -i 's|^Icon=.*|Icon=/usr/share/icons/hicolor/256x256/apps/openttd.png|' media/openttd.desktop.in
+      sed -E -i 's|^Icon=.*|Icon=/usr/share/icons/hicolor/256x256/apps/openttd.png|' media/openttd.desktop
     configflags:
-      - --prefix=/usr
-      - --binary-dir=games/openttd
-      - --data-dir=games/openttd
-      - --install-dir=$SNAPCRAFT_PART_INSTALL
-      - --enable-lto
-      - --enable-strip
-      - --with-fluidsynth
-      - --with-sdl=sdl2
-      - --with-zlib
-      - --with-liblzma
-      - --with-liblzo2
-      - --with-libpng
-      - --with-freetype
-      - --with-fontconfig
-      - --with-icu
-      - --with-icu-layout
-      - --with-iconv
+      - -DCMAKE_INSTALL_PREFIX=/usr
+      - -DCMAKE_INSTALL_DATADIR=games
+      - -DCMAKE_INSTALL_BINDIR=games/openttd
+      - -DCMAKE_BUILD_TYPE=Release
     build-packages:
       - g++
       - patch
