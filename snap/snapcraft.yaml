@@ -16,6 +16,11 @@ confinement: strict
 base: core18
 compression: lzo
 
+architectures:
+- build-on: amd64
+- build-on: arm64
+- build-on: armhf
+
 apps:
   openttd:
     command: usr/games/openttd/openttd
