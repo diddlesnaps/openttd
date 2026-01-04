@@ -13,35 +13,36 @@ description: >
 
 grade: stable
 confinement: strict
-base: core20
-compression: lzo
+base: core24
 
-architectures:
-- build-on: amd64
-- build-on: arm64
-- build-on: armhf
+platforms:
+  amd64:
+  arm64:
+  armhf:
 
 apps:
   openttd:
     command: usr/games/openttd/openttd
     desktop: usr/share/applications/openttd.desktop
-    extensions: [gnome-3-38]
+    extensions: [gnome]
     plugs:
       - audio-playback
+      - desktop
+      - desktop-legacy
       - network
       - network-bind
-      - opengl
-      - x11
 
 layout:
   /etc/default:
     bind: $SNAP/etc/default
   /etc/timidity:
     bind: $SNAP/etc/timidity
-  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/alsa-lib:
-    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/alsa-lib
+  /usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/alsa-lib:
+    bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/alsa-lib
   /usr/share/alsa:
     bind: $SNAP/usr/share/alsa
+  /usr/share/midi:
+    bind: $SNAP/usr/share/midi
   /usr/share/sounds:
     bind: $SNAP/usr/share/sounds
 
@@ -50,11 +51,14 @@ parts:
     plugin: cmake
     source: https://github.com/OpenTTD/OpenTTD.git
     override-pull: |
-      snapcraftctl pull
+      craftctl default
       VERSION="$(git tag --list --sort=version:refname | grep -v -E '(-RC|beta)' | tail -n1)"
       git checkout "$VERSION"
-      snapcraftctl set-version "$VERSION"
+      craftctl set version="$VERSION"
       sed -E -i 's|^Icon=.*|Icon=/usr/share/icons/hicolor/256x256/apps/openttd.png|' media/openttd.desktop
+    override-build: |
+      craftctl default
+      sed -E -i 's|SOUND_FONT=.*|SOUND_FONT=/usr/share/sounds/sf2/FluidR3_GM.sf2|' $CRAFT_PART_INSTALL/etc/default/fluidsynth
     cmake-parameters:
       - -DCMAKE_INSTALL_PREFIX=/usr
       - -DCMAKE_INSTALL_DATADIR=games
@@ -69,24 +73,21 @@ parts:
       - libfontconfig1-dev
       - libglu1-mesa-dev
       - libicu-dev
-      - libicu-le-hb-dev
       - liblzma-dev
       - liblzo2-dev
       - libsdl2-dev
       - zlib1g-dev
     stage-packages:
       - fluid-soundfont-gm
-      - fluid-soundfont-gs
       - fluidsynth
       - freepats
       - liballegro4.4
       - libaudio2
-      - libfluidsynth2
+      - libfluidsynth3
       - libfontconfig1
       - libfreetype6
       - libglu1-mesa
-      - libicu-le-hb0
-      - libicu66
+      - libicu74
       - liblzma5
       - liblzo2-2
       - libsdl2-2.0-0
