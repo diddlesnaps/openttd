@@ -81,7 +81,7 @@ parts:
       - fluid-soundfont-gm
       - fluidsynth
       - freepats
-      - liballegro4.4
+      - liballegro4.4t64
       - libaudio2
       - libfluidsynth3
       - libfontconfig1
